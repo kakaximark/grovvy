@@ -1,0 +1,34 @@
+{
+    "global": {
+        "imageUrl": "hub.example.com",
+        "k8sServer": "https://www.example.com:6443",
+        "nexusUrl": "maven.example.com",
+        "nexusRepository": "maven-snapshots",
+        "nexusGroupId": "example",
+        "nexusCredentialsId": "maven-repo",
+        "gitCredentialsId": "example",
+        "protocol": "https",
+        "kubeCredentialsId": "kubeconfig-prod",
+        "uploadFlag": "false",
+        "extraBuildTag": "true",
+        "ingressTag": "false"
+    },
+    "account-main": {
+        "appType": "backend",
+        "gitUrl": "https://git.example.com/example/example.git",
+        "buildParams": "/opt/maven/bin/mvn clean package -DskipTests=true --update-snapshots",
+        "packagePath": "example/target",
+        "uploadFlag": "true",
+        "artifactId": "example",
+        "uploadPath": "example/target"
+    },
+    "search-main": {
+        "appType": "backend",
+        "gitUrl": "https://git.example.com/example/example.git",
+        "buildParams": "/opt/maven/bin/mvn clean package -DskipTests=true --update-snapshots",
+        "packagePath": "example/target",
+        "uploadFlag": "false",
+        "artifactId": "example",
+        "uploadPath": "example/target"
+    }
+}
