@@ -33,7 +33,7 @@ pipeline{
 //        string(name: "branch", defaultValue: "test_1.3.0", description: "choose branch")
 //    }
     environment {
-        confFile = "bank/bank-conf-prod.json"
+        confFile = "example/example-conf-prod.json"
     }
     stages {
         stage("Get variables") {
