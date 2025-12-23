@@ -29,11 +29,19 @@ pipeline{
       timestamps()
       timeout(time: 30, unit:'MINUTES')
     }
-//  parameters {
-//        string(name: "branch", defaultValue: "test_1.3.0", description: "choose branch")
-//    }
+    parameters {
+        gitParameter type: 'PT_BRANCH_TAG',
+                    name: 'A_BRANCH_TAG',
+                    defaultValue: 'master',
+                    description: 'Choose a tag or branch to checkout',
+                    selectedValue: 'DEFAULT',
+                    sortMode: 'DESCENDING_SMART',
+                    useRepository: 'tg-game'
+    }
     environment {
         confFile = "example/example-conf-prod.json"
+        JAVA_HOME = "/usr/local/jdk-21.0.3"
+        PATH = "$JAVA_HOME/bin:$PATH"
     }
     stages {
         stage("Get variables") {
@@ -83,7 +91,7 @@ pipeline{
         }
         stage("Pull code") {
             steps {
-                checkout scmGit(branches: [[name: "${branch}"]], extensions: [],
+                checkout scmGit(branches: [[name: "${A_BRANCH_TAG}"]], extensions: [],
                 userRemoteConfigs: [[credentialsId: "${gitCredentialsId}",
                 url: "${gitUrl}"]])
             }
@@ -119,7 +127,30 @@ pipeline{
              )
             }
         }
-      
+        stage("Deploy Backend") {
+            when {
+                environment name: 'appType', value: 'backend'
+           }
+            steps {
+                sh '''
+                    CODE_PATH=${PWD}/${packagePath}/app.jar
+                    echo "Deploy.......Backend........"
+                    ansible-playbook -i /etc/ansible/hosts -l ${project} /etc/ansible/playbook/main.yml -e "src_path=${CODE_PATH} dst_path=${remotePath}" --tags "${appType}"
+                '''
+            }
+        }
+        stage("Deploy Front") {
+            when {
+                environment name: 'appType', value: 'front'
+           }
+            steps {
+                sh '''
+                    CODE_PATH=${PWD}/${packagePath}/
+                    echo "Deploy.......Front......."
+                    ansible-playbook -i /etc/ansible/hosts -l ${project} /etc/ansible/playbook/main.yml -e "src_path=${CODE_PATH} dst_path=${remotePath}" --tags "${appType}"
+                '''
+            }
+        }
         stage("Image build") {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor', usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_PASS')]) {
