@@ -1,27 +1,27 @@
 {   
     "global": {
         "kubeconfig": "kubeconfig",
-        "registry_credential": "e3f23d11-485f-4474-9c29-eef27a53a7c2",
-        "maven_settings": "a5734434-7034-405d-9155-debeb3cff086",
+        "registry_credential": "e3f23d11-485f-4474-9c29",
+        "maven_settings": "a5734434-7034-405d-9155",
         "maven_credential": "maven_auth",
         "default_branch": "main",
-        "fallback_branches": ["master", "test", "eth_univ2", "wallet_dex_eth"],
-        "git_credential": "gitlab_auth",
-        "deploy_cluster": "k8s-dev",
-        "img_registry_user": "apk8888",
-        "img_registry_pwd": "x4k9wtSXxxgipIJDrMQP",
-        "img_registry": "https://hub.rancher8888.com"
+        "fallback_branches": ["master", "test"],
+        "git_credential": "gitlab_user",
+        "deploy_cluster": "k8s-cluster",
+        "img_registry_user": "admin",
+        "img_registry_pwd": "admin",
+        "img_registry": "https://hub.example.com"
 
     },
     "wallet-aggregator": {
         "programming": "rust",
-        "git": "https://git.nexus58.com/wallet/client/wallet-aggregator.git",
+        "git": "https://git.gitlab.com/wallet/client/example.git",
         "build_command": "CARGO_NET_GIT_FETCH_WITH_CLI=true make build_api_rel",
         "build_pre": [{
             "function": "cloneCore",
             "args": {
-                "path": "/home/jenkins/agent/workspace/wallet-aggregator/wallet_core",
-                "git": "https://git.nexus58.com/wallet/client/wallet_core.git",
+                "path": "/home/jenkins/agent/workspace/example",
+                "git": "https://git.gitlab.com/wallet/client/example.git",
                 "branch": "main"
             }
         }],
@@ -40,7 +40,7 @@
             }
         ],
         "images": {
-            "build": "hub.rancher8888.com/base/rust-base:latest"
+            "build": "hub.example.com/base/rust-base:latest"
         },
         "inside_args": {
             "build": "-v /root/.cargo:/root/.cargo"
@@ -48,21 +48,21 @@
       "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
+        "base_image": "hub.example.com/base/recharge-rust-base:latest",
         "job_prefix": "aggregator",
         "exec_command": "",
         "upload_flag": "true"
     },
     "graph-node-eth-univ2": {
         "programming": "java",
-        "git": "https://git.nexus58.com/wallet/client/wallet-dex-graph-node.git",
+        "git": "https://git.example.com/wallet/client/example.git",
         "build_command": "sed -i 's/docker build/docker build --network=host/' docker/build.sh && bash docker/build.sh",
         "build_pre": [],
         "build_post": [{
             "function": "buildGraphNode",
             "args": {
-                "image": "hub.rancher8888.com/wallet-prod/graph-node-eth-univ2"
+                "image": "hub.example.com/example/example"
             }
         }],
         "build_platform": "node",
@@ -81,8 +81,8 @@
       "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "docker_registry_url_prefix": "hub.example.com/example",
+        "base_image": "hub.example.com/base/example:latest",
         "job_prefix": "graph-node",
         "exec_command": "",
         "upload_flag": "true",
@@ -90,13 +90,13 @@
     },
     "graph-node-eth-univ3": {
         "programming": "java",
-        "git": "https://git.nexus58.com/wallet/client/wallet-dex-graph-node.git",
+        "git": "https://git.example.com/wallet/client/example.git",
         "build_command": "sed -i 's/docker build/docker build --network=host/' docker/build.sh && bash docker/build.sh",
         "build_pre": [],
         "build_post": [{
             "function": "buildGraphNode",
             "args": {
-                "image": "hub.rancher8888.com/wallet-prod/graph-node-eth-univ3"
+                "image": "hub.example.com/example/example"
             }
         }],
         "build_platform": "node",
@@ -115,8 +115,8 @@
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "docker_registry_url_prefix": "hub.example.com/example",
+        "base_image": "hub.example.com/example/example:latest",
         "job_prefix": "graph-node",
         "exec_command": "",
         "upload_flag": "true",
@@ -124,7 +124,7 @@
     },
     "wallet-dex-v3-subgraph": {
         "programming": "node",
-        "git": "https://git.nexus58.com/wallet/client/wallet-dex-v3-subgraph.git",
+        "git": "https://git.example.com/wallet/client/example.git",
         "build_command": "npm install -g @graphprotocol/graph-cli && yarn install && yarn clean && graph codegen && mv generated src/types && graph build && graph create eth_uniswap_v3 --node http://graph-node-eth-univ3.graph-node:8020 && graph deploy eth_uniswap_v3 --ipfs http://eth-univ3-ipfs.graph-node:5001 --node http://graph-node-eth-univ3.graph-node:8020 -l v0.0.1",
         "build_pre": [],
         "build_post": [],
@@ -148,8 +148,8 @@
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "docker_registry_url_prefix": "hub.example.com/example",
+        "base_image": "hub.example.com/example/example:latest",
         "job_prefix": "graph-node",
         "exec_command": "",
         "upload_flag": "true",
@@ -158,7 +158,7 @@
       },
     "wallet-dex-v2-subgraph": {
         "programming": "node",
-        "git": "http://git.nexus58.com/wallet/client/wallet-dex-v2-subgraph.git",
+        "git": "http://git.example.com/wallet/client/example.git",
         "build_command": "npm install -g @graphprotocol/graph-cli && yarn install && yarn clean && graph codegen && mv generated src/types && graph build && graph create eth_uniswap_v2 --node http://graph-node-eth-univ2.graph-node:8020 && graph deploy eth_uniswap_v2 --ipfs http://eth-univ2-ipfs.graph-node:5001 --node http://graph-node-eth-univ2.graph-node:8020 -l v0.0.1",
         "build_pre": [],
         "build_post": [],
@@ -182,8 +182,8 @@
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
+        "base_image": "hub.example.com/base/example:latest",
         "job_prefix": "graph-node",
         "exec_command": "",
         "upload_flag": "true",
@@ -193,7 +193,7 @@
     "api-platform_wallet-prod": {
         "programming": "java",
         "default_branch": "test",
-        "git": "https://git.nexus58.com/wallet/server/wallet-api.git",
+        "git": "https://git.example.com/wallet/server/example.git",
         "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
         "build_pre": [],
         "build_post": [
@@ -201,8 +201,8 @@
                 "function": "uploadNexusArtifactUploader",
                 "args": {
                     "file": "com.wallet.rpc/target/app.jar",
-                    "artifact_id": "com.wallet.rpc",
-                    "group": "walletApi",
+                    "artifact_id": "com.example.rpc",
+                    "group": "example",
                     "subfix": "1.0-prod-SNAPSHOT"
                 }
               }
@@ -216,21 +216,21 @@
                 "name": "MODULES",
                 "description": "选择模块(多选)",
                 "choices": {
-                    "api":      "com.wallet.web/com.wallet.web.api/target",
-                    "agent":    "com.wallet.web/com.wallet.web.agent/target",
-                    "main":     "com.wallet.web/com.wallet.web.main/target",
-                    "block":    "com.wallet.web/com.wallet.web.block/target",
-                    "job":      "com.wallet.web/com.wallet.web.job/target",
-                    "key":      "com.wallet.web/com.wallet.web.key/target",
-                    "tg":       "com.wallet.web/com.wallet.web.tg/target"
+                    "api":      "com.example.web/com.example.web.api/target",
+                    "agent":    "com.example.web/com.example.web.agent/target",
+                    "main":     "com.example.web/com.example.web.main/target",
+                    "block":    "com.example.web/com.example.web.block/target",
+                    "job":      "com.example.web/com.example.web.job/target",
+                    "key":      "com.example.web/com.example.web.key/target",
+                    "tg":       "com.example.web/com.example.web.tg/target"
                 }
             }
         ],
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/openjdk:21.0.3",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
+        "base_image": "hub.example.com/base/openjdk:21.0.3",
         "job_prefix": "api-platform",
         "exec_command": "",
         "upload_flag": "true",
@@ -245,7 +245,7 @@
     },
     "api-account_wallet-prod": {
         "programming": "java",
-        "git": "https://git.nexus58.com/wallet/server/wallet-api-account.git",
+        "git": "https://git.example.com/wallet/server/wallet-api-account.git",
         "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
         "build_pre": [],
         "build_post": [
@@ -275,8 +275,8 @@
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
-        "base_image": "hub.rancher8888.com/base/openjdk:21.0.3",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
+        "base_image": "hub.example.com/base/openjdk:21.0.3",
         "job_prefix": "api",
         "exec_command": "",
         "upload_flag": "true",
@@ -290,7 +290,7 @@
     },
   "api-agent-ui_wallet-prod": {
         "programming": "frontend",
-        "git": "https://git.nexus58.com/wallet/web/recarge-agent.git",
+        "git": "https://git.example.com/wallet/web/example.git",
         "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
         "build_pre": [],
         "build_post": [],
@@ -307,13 +307,13 @@
                 }
             }
         ],
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "docker_registry_url_prefix": "hub.example.com/example",
         "base_image": "",
         "job_prefix": "api",
         "exec_command": "",
         "upload_flag": "true",
         "images": {
-            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "build": "hub.example.com/base/node:18-alpine",
             "deploy": "bitnami/kubectl"
         },
         "inside_args": {
@@ -322,7 +322,7 @@
     },
     "api-main-ui_wallet-prod": {
         "programming": "frontend",
-        "git": "https://git.nexus58.com/wallet/web/recharge-main.git",
+        "git": "https://git.example.com/wallet/web/example.git",
         "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
         "build_pre": [],
         "build_post": [],
@@ -339,13 +339,13 @@
                 }
             }
         ],
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "docker_registry_url_prefix": "hub.example.com/example",
         "base_image": "",
         "job_prefix": "api",
         "exec_command": "",
         "upload_flag": "true",
         "images": {
-            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "build": "hub.example.com/base/node:18-alpine",
             "deploy": "bitnami/kubectl"
         },
       "inside_args": {
@@ -354,7 +354,7 @@
     },
     "api-qrcode-ui_wallet-prod": {
         "programming": "frontend",
-        "git": "https://git.nexus58.com/wallet/web/recharge-api-web.git",
+        "git": "https://git.example.com/wallet/web/recharge-api-web.git",
         "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
         "build_pre": [],
         "build_post": [],
@@ -371,11 +371,11 @@
                 }
             }
         ],
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
         "base_image": "",
         "job_prefix": "api",
         "images": {
-            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "build": "hub.example.com/base/node:18-alpine",
             "deploy": "bitnami/kubectl"
         },
         "inside_args": {
@@ -384,7 +384,7 @@
     },
   "wallet-platform_wallet-prod": {
         "programming": "java",
-        "git": "https://git.nexus58.com/wallet/server/com.wallet.platform.git",
+        "git": "https://git.example.com/wallet/server/example.git",
         "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
         "build_pre": [],
         "build_post": [
@@ -417,7 +417,7 @@
         "source": "global-pay-key-rpc/target",
         "destnation_dir": "/opt/apps",
         "destnation_host": "user@server.com",
-        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "docker_registry_url_prefix": "hub.example.com/wallet-prod",
         "base_image": "",
         "job_prefix": "platform",
         "exec_command": "",
