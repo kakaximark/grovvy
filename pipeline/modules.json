@@ -1,0 +1,433 @@
+{   
+    "global": {
+        "kubeconfig": "kubeconfig",
+        "registry_credential": "e3f23d11-485f-4474-9c29-eef27a53a7c2",
+        "maven_settings": "a5734434-7034-405d-9155-debeb3cff086",
+        "maven_credential": "maven_auth",
+        "default_branch": "main",
+        "fallback_branches": ["master", "test", "eth_univ2", "wallet_dex_eth"],
+        "git_credential": "gitlab_auth",
+        "deploy_cluster": "k8s-dev",
+        "img_registry_user": "apk8888",
+        "img_registry_pwd": "x4k9wtSXxxgipIJDrMQP",
+        "img_registry": "https://hub.rancher8888.com"
+
+    },
+    "wallet-aggregator": {
+        "programming": "rust",
+        "git": "https://git.nexus58.com/wallet/client/wallet-aggregator.git",
+        "build_command": "CARGO_NET_GIT_FETCH_WITH_CLI=true make build_api_rel",
+        "build_pre": [{
+            "function": "cloneCore",
+            "args": {
+                "path": "/home/jenkins/agent/workspace/wallet-aggregator/wallet_core",
+                "git": "https://git.nexus58.com/wallet/client/wallet_core.git",
+                "branch": "main"
+            }
+        }],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "api": ""
+                }
+            }
+        ],
+        "images": {
+            "build": "hub.rancher8888.com/base/rust-base:latest"
+        },
+        "inside_args": {
+            "build": "-v /root/.cargo:/root/.cargo"
+        },
+      "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "job_prefix": "aggregator",
+        "exec_command": "",
+        "upload_flag": "true"
+    },
+    "graph-node-eth-univ2": {
+        "programming": "java",
+        "git": "https://git.nexus58.com/wallet/client/wallet-dex-graph-node.git",
+        "build_command": "sed -i 's/docker build/docker build --network=host/' docker/build.sh && bash docker/build.sh",
+        "build_pre": [],
+        "build_post": [{
+            "function": "buildGraphNode",
+            "args": {
+                "image": "hub.rancher8888.com/wallet-prod/graph-node-eth-univ2"
+            }
+        }],
+        "build_platform": "node",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "eth-univ2": "docker"
+                }
+            }
+        ],
+      "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "job_prefix": "graph-node",
+        "exec_command": "",
+        "upload_flag": "true",
+        "skip_build_img": "true"
+    },
+    "graph-node-eth-univ3": {
+        "programming": "java",
+        "git": "https://git.nexus58.com/wallet/client/wallet-dex-graph-node.git",
+        "build_command": "sed -i 's/docker build/docker build --network=host/' docker/build.sh && bash docker/build.sh",
+        "build_pre": [],
+        "build_post": [{
+            "function": "buildGraphNode",
+            "args": {
+                "image": "hub.rancher8888.com/wallet-prod/graph-node-eth-univ3"
+            }
+        }],
+        "build_platform": "node",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                  "eth-univ3": "docker"
+                }
+            }
+        ],
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "job_prefix": "graph-node",
+        "exec_command": "",
+        "upload_flag": "true",
+        "skip_build_img": "true"
+    },
+    "wallet-dex-v3-subgraph": {
+        "programming": "node",
+        "git": "https://git.nexus58.com/wallet/client/wallet-dex-v3-subgraph.git",
+        "build_command": "npm install -g @graphprotocol/graph-cli && yarn install && yarn clean && graph codegen && mv generated src/types && graph build && graph create eth_uniswap_v3 --node http://graph-node-eth-univ3.graph-node:8020 && graph deploy eth_uniswap_v3 --ipfs http://eth-univ3-ipfs.graph-node:5001 --node http://graph-node-eth-univ3.graph-node:8020 -l v0.0.1",
+        "build_pre": [],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "eth-univ3-subgraph": ""
+                }
+            }
+        ],
+        "images": {
+            "build": "node:20-bullseye"
+        },
+        "inside_args": {},
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "job_prefix": "graph-node",
+        "exec_command": "",
+        "upload_flag": "true",
+        "skip_build_img": "true",
+        "skip_deploy_stage": "true"
+      },
+    "wallet-dex-v2-subgraph": {
+        "programming": "node",
+        "git": "http://git.nexus58.com/wallet/client/wallet-dex-v2-subgraph.git",
+        "build_command": "npm install -g @graphprotocol/graph-cli && yarn install && yarn clean && graph codegen && mv generated src/types && graph build && graph create eth_uniswap_v2 --node http://graph-node-eth-univ2.graph-node:8020 && graph deploy eth_uniswap_v2 --ipfs http://eth-univ2-ipfs.graph-node:5001 --node http://graph-node-eth-univ2.graph-node:8020 -l v0.0.1",
+        "build_pre": [],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "eth-univ2-subgraph": ""
+                }
+            }
+        ],
+        "images": {
+            "build": "node:20-bullseye"
+        },
+      "inside_args": {},
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/recharge-rust-base:latest",
+        "job_prefix": "graph-node",
+        "exec_command": "",
+        "upload_flag": "true",
+        "skip_build_img": "true",
+        "skip_deploy_stage": "true"
+    },
+    "api-platform_wallet-prod": {
+        "programming": "java",
+        "default_branch": "test",
+        "git": "https://git.nexus58.com/wallet/server/wallet-api.git",
+        "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
+        "build_pre": [],
+        "build_post": [
+            {
+                "function": "uploadNexusArtifactUploader",
+                "args": {
+                    "file": "com.wallet.rpc/target/app.jar",
+                    "artifact_id": "com.wallet.rpc",
+                    "group": "walletApi",
+                    "subfix": "1.0-prod-SNAPSHOT"
+                }
+              }
+        ],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "api":      "com.wallet.web/com.wallet.web.api/target",
+                    "agent":    "com.wallet.web/com.wallet.web.agent/target",
+                    "main":     "com.wallet.web/com.wallet.web.main/target",
+                    "block":    "com.wallet.web/com.wallet.web.block/target",
+                    "job":      "com.wallet.web/com.wallet.web.job/target",
+                    "key":      "com.wallet.web/com.wallet.web.key/target",
+                    "tg":       "com.wallet.web/com.wallet.web.tg/target"
+                }
+            }
+        ],
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/openjdk:21.0.3",
+        "job_prefix": "api-platform",
+        "exec_command": "",
+        "upload_flag": "true",
+        "images": {
+            "build": "maven:3.9.9-eclipse-temurin-21",
+            "deploy": "bitnami/kubectl"
+        },
+      "inside_args": {
+            "build": "-v /tmp/m2:/root/.m2/"
+        }
+
+    },
+    "api-account_wallet-prod": {
+        "programming": "java",
+        "git": "https://git.nexus58.com/wallet/server/wallet-api-account.git",
+        "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
+        "build_pre": [],
+        "build_post": [
+             {
+                "function": "uploadNexusArtifactUploader",
+                "args": {
+                    "file": "com.wallet.api.account.rpc/target/app.jar",
+                    "artifact_id": "com.wallet.api.account.rpc",
+                    "group": "walletApi",
+                    "subfix": "1.0-prod-SNAPSHOT"
+                }
+            }
+        ],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "account":    "com.wallet.api.account.web/target"
+                }
+            }
+        ],
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "hub.rancher8888.com/base/openjdk:21.0.3",
+        "job_prefix": "api",
+        "exec_command": "",
+        "upload_flag": "true",
+        "images": {
+            "build": "maven:3.9.9-eclipse-temurin-21",
+            "deploy": "bitnami/kubectl"
+        },
+        "inside_args": {
+            "build": "-v /tmp/m2:/root/.m2/"
+        }
+    },
+  "api-agent-ui_wallet-prod": {
+        "programming": "frontend",
+        "git": "https://git.nexus58.com/wallet/web/recarge-agent.git",
+        "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
+        "build_pre": [],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "agent-ui": ""
+                }
+            }
+        ],
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "",
+        "job_prefix": "api",
+        "exec_command": "",
+        "upload_flag": "true",
+        "images": {
+            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "deploy": "bitnami/kubectl"
+        },
+        "inside_args": {
+          "build": "-v /tmp/m2:/root/.m2/"
+        }
+    },
+    "api-main-ui_wallet-prod": {
+        "programming": "frontend",
+        "git": "https://git.nexus58.com/wallet/web/recharge-main.git",
+        "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
+        "build_pre": [],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "main-ui": ""
+                }
+            }
+        ],
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "",
+        "job_prefix": "api",
+        "exec_command": "",
+        "upload_flag": "true",
+        "images": {
+            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "deploy": "bitnami/kubectl"
+        },
+      "inside_args": {
+            "build": "-v /tmp/m2:/root/.m2/"
+        }
+    },
+    "api-qrcode-ui_wallet-prod": {
+        "programming": "frontend",
+        "git": "https://git.nexus58.com/wallet/web/recharge-api-web.git",
+        "build_command": "npm install -g pnpm && pnpm i && pnpm run build",
+        "build_pre": [],
+        "build_post": [],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+                "choices": {
+                    "qrcode-ui": ""
+                }
+            }
+        ],
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "",
+        "job_prefix": "api",
+        "images": {
+            "build": "hub.rancher8888.com/base/node:18-alpine",
+            "deploy": "bitnami/kubectl"
+        },
+        "inside_args": {
+            "build": "-v /tmp/m2:/root/.m2/"
+        }
+    },
+  "wallet-platform_wallet-prod": {
+        "programming": "java",
+        "git": "https://git.nexus58.com/wallet/server/com.wallet.platform.git",
+        "build_command": "mvn clean package -Dmaven.test.skip=true --settings settings.xml",
+        "build_pre": [],
+        "build_post": [
+            {
+                "function": "uploadNexusArtifactUploader",
+                "args": {
+                    "file": "com.wallet.platform.rpc/target/app.jar",
+                    "artifact_id": "com.wallet.platform.rpc",
+                    "group": "com.wallet",
+                    "subfix": "1.0-prod-SNAPSHOT"
+                }
+            }
+        ],
+        "build_platform": "kubernetes",
+        "platform": "kubernetes",
+        "parameters": [
+            {
+                "type": "multi-choice",
+                "must": true,
+                "name": "MODULES",
+                "description": "选择模块(多选)",
+              "choices": {
+                    "aw-api":   "com.wallet.platform.web/com.wallet.platform.web.apiwallet/com.wallet.platform.web.apiwallet.api/target",
+                    "aw-rpc":   "com.wallet.platform.web/com.wallet.platform.web.apiwallet/com.wallet.platform.web.apiwallet.rpc/target",
+                    "aw-job":   "com.wallet.platform.web/com.wallet.platform.web.apiwallet/com.wallet.platform.web.apiwallet.job/target"
+
+                }
+            }
+        ],
+        "source": "global-pay-key-rpc/target",
+        "destnation_dir": "/opt/apps",
+        "destnation_host": "user@server.com",
+        "docker_registry_url_prefix": "hub.rancher8888.com/wallet-prod",
+        "base_image": "",
+        "job_prefix": "platform",
+        "exec_command": "",
+        "upload_flag": "true",
+        "images": {
+            "build": "maven:3.9.9-eclipse-temurin-17",
+            "deploy": "bitnami/kubectl"
+        },
+        "inside_args": {
+            "build": "-v /tmp/m2:/root/.m2/"
+        }
+    }
+}
